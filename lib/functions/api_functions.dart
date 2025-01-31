@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:netflix/models/api.dart';
 import 'package:netflix/models/categories.dart';
 import 'package:netflix/models/movie_class.dart';
+import 'package:netflix/utils/api_key.dart';
 
 class Api {
   Dio dio = Dio();
@@ -12,7 +13,7 @@ class Api {
     try {
       final response = await dio.get(Constants.trendingAll, queryParameters: {
         'language': Constants.language,
-        'api_key': Constants.apiKey,
+        'api_key': apiKey,
       });
       if (response.statusCode == 200) {
         List<dynamic> data = response.data['results'];
@@ -32,7 +33,7 @@ class Api {
     try {
       final response = await dio.get(Constants.trendingAll, queryParameters: {
         'language': Constants.language,
-        'api_key': Constants.apiKey,
+        'api_key': apiKey,
       });
       if (response.statusCode == 200) {
         List<dynamic> data = response.data['results'];
@@ -50,7 +51,7 @@ class Api {
   Future<ContentCategories> getMoviesByGenre(List<int> genreIds) async {
     try {
       final response = await dio.get(Constants.discoverMovies, queryParameters: {
-        'api_key': Constants.apiKey,
+        'api_key': apiKey,
         'with_genres': genreIds.join(','), // Convert genre IDs to comma-separated values
         'language': Constants.language,
         'sort_by': Constants.sortBy, // Optional: Sort movies by popularity
@@ -99,7 +100,7 @@ class Api {
   Future<ContentCategories> searchMovies(String query) async {
     try {
       final response = await dio.get(Constants.searchMovies, queryParameters: {
-        'api_key': Constants.apiKey,
+        'api_key': apiKey,
         'language': Constants.language,
         'query': query,
       });
@@ -120,7 +121,7 @@ class Api {
   Future<ContentCategories> getMoviesByLanguage(String languageCode, String title) async {
     try {
       final response = await dio.get(Constants.discoverMovies, queryParameters: {
-        'api_key': Constants.apiKey,
+        'api_key': apiKey,
         'with_original_language': languageCode,
         'sort_by': Constants.sortBy, // Optional: Sort movies by popularity
       });
@@ -142,7 +143,7 @@ class Api {
   Future<ContentCategories> getPopularMovies() async {
     try {
       final response = await dio.get("${Constants.baseUrl}/movie/popular", queryParameters: {
-        'api_key': Constants.apiKey,
+        'api_key': apiKey,
         'language': Constants.language,
       });
       if (response.statusCode == 200) {
@@ -162,7 +163,7 @@ class Api {
   Future<ContentCategories> getNowPlayingMovies() async {
     try {
       final response = await dio.get("${Constants.baseUrl}/movie/now_playing", queryParameters: {
-        'api_key': Constants.apiKey,
+        'api_key': apiKey,
         'language': Constants.language,
       });
       if (response.statusCode == 200) {
@@ -182,7 +183,7 @@ class Api {
   Future<ContentCategories> getTopRatedMovies() async {
     try {
       final response = await dio.get("${Constants.baseUrl}/movie/top_rated", queryParameters: {
-        'api_key': Constants.apiKey,
+        'api_key': apiKey,
         'language': Constants.language,
       });
       if (response.statusCode == 200) {
@@ -202,7 +203,7 @@ class Api {
   Future<ContentCategories> getUpcomingMovies() async {
     try {
       final response = await dio.get("${Constants.baseUrl}/movie/upcoming", queryParameters: {
-        'api_key': Constants.apiKey,
+        'api_key': apiKey,
         'language': Constants.language,
       });
       if (response.statusCode == 200) {
