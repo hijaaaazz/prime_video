@@ -15,12 +15,12 @@ class _ScreenSplashState extends State<ScreenSplash> {
   @override
   void initState(){
     super.initState();
-
     Future.delayed(const Duration(seconds: 3), (){
       // ignore: use_build_context_synchronously
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => ScreenMain(),));
     });
   }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(

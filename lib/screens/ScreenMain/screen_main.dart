@@ -60,6 +60,8 @@ class _ScreenMainState extends State<ScreenMain> {
 
 
 class SubscriptionScreen extends StatelessWidget {
+  const SubscriptionScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Center(child: Text("Subscription Screen", style: TextStyle(fontSize: 20, color: Colors.white)));
@@ -67,6 +69,8 @@ class SubscriptionScreen extends StatelessWidget {
 }
 
 class DownloadsScreen extends StatelessWidget {
+  const DownloadsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Center(child: Text("Downloads Screen", style: TextStyle(fontSize: 20, color: Colors.white)));
@@ -74,6 +78,8 @@ class DownloadsScreen extends StatelessWidget {
 }
 
 class SearchScreen extends StatelessWidget {
+  const SearchScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Center(child: Text("Search Screen", style: TextStyle(fontSize: 20, color: Colors.white)));

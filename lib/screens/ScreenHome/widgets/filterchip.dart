@@ -8,6 +8,7 @@ class CustomFilterChip extends StatefulWidget {
   CustomFilterChip({super.key, required this.text});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CustomFilterChipState createState() => _CustomFilterChipState();
 }
 

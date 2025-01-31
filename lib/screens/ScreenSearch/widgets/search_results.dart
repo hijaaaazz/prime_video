@@ -1,92 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:netflix/models/categories.dart';
+import 'package:netflix/screens/widgets/loading_indicator.dart';
+import 'package:netflix/screens/widgets/movie_listtile.dart'; // Assuming the Movie class is here
 
-class SearchResultsList extends StatefulWidget {
-  const SearchResultsList({super.key});
 
-  @override
-  State<SearchResultsList> createState() => _SearchResultsListState();
-}
+class SearchResultsList extends StatelessWidget {
+  final String searchQuery;
+  final ContentCategories? searchResults;
+  final bool isLoading;
 
-class _SearchResultsListState extends State<SearchResultsList> {
+  const SearchResultsList({
+    super.key,
+    required this.searchQuery,
+    required this.searchResults,
+    required this.isLoading,
+  });
+
   @override
   Widget build(BuildContext context) {
-    return  Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Results",
+      children: [
+        Text(
+          "Results for: $searchQuery",
           style: GoogleFonts.outfit(
             fontSize: 20,
-            fontWeight: FontWeight.w800
-          ),),
-          SizedBox(
-            width: double.infinity,
-            height: 500,
-
-            child: ListView.builder(
-              itemCount: 10,
-              itemBuilder: (context,index){
-              return Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: Container(
-                width: double.infinity,
-                height: 100,
-                decoration: BoxDecoration(
-                 
-                ),
-                child: Row(
-                  children: [
-                   
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: AspectRatio(
-                        aspectRatio: 16 / 9,  
-                        child: Container(
-                          
-                          color: Colors.yellowAccent,  
-                        ),
-                      ),
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        SizedBox(
+          width: double.infinity,
+          height: 500,
+          child: isLoading
+              ? Center(child: LoadingCircle())  
+              : (searchResults == null || searchResults!.movieList.isEmpty)
+                  ? Center(child: Text("No results found"))
+                  : ListView.builder(
+                      itemCount: searchResults!.movieList.length,
+                      itemBuilder: (context, index) {
+                        var movie = searchResults!.movieList[index];
+                        return MovieListTile(movie: movie);
+                      },
                     ),
+        ),
 
-                    // Expanded widget to fill the remaining space
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Title",
-                            style: GoogleFonts.lato(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          Text(
-                            "Year Duration",
-                            style: GoogleFonts.outfit(
-                              fontSize: 14,
-                              color: const Color.fromARGB(255, 219, 219, 219),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    
-                    // Aligning the Icon to the top-left
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: Icon(
-                        Icons.more_vert,
-                        color: const Color.fromARGB(255, 219, 219, 219),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-
-            }),
-          )
-        ],
-      );
-      }
+      ],
+    );
   }
+}

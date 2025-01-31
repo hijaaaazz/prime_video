@@ -1,13 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:netflix/screens/ScreenHome/widgets/carousel_slider.dart';
+import 'package:netflix/functions/api_functions.dart';
+import 'package:netflix/models/categories.dart';
 import 'package:netflix/screens/ScreenHome/widgets/filterchip.dart';
-import 'package:netflix/screens/ScreenHome/widgets/shows_categories.dart';
 import 'package:netflix/screens/widgets/base_ui.dart';
 
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+
+
+class _HomeScreenState extends State<HomeScreen> {
+
+  late Future <List<ContentCategories>> allContent;
+
+  late Future<ContentCategories> trendingAll;
+  late Future<ContentCategories> popularAll;
+  late Future<ContentCategories> nowPlaying;
+  late Future<ContentCategories> topRated;
+  late Future<ContentCategories> upComing;
+
+  @override
+void initState() {
+  super.initState();
+
+  trendingAll = Api().getTrendingAll();
+  popularAll = Api().getUpcomingMovies();
+  nowPlaying = Api().getPopularMovies();
+  topRated = Api().getNowPlayingMovies();
+  upComing = Api().getTopRatedMovies();
+
+  allContent = Future.wait([popularAll,nowPlaying,topRated,upComing]);
+}
+
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +67,25 @@ class HomeScreen extends StatelessWidget {
                 IconButton(onPressed: () {}, icon: Icon(Icons.person)),
               ],
             ),
-            BaseUi()
+            SizedBox(
+                  height: 100,
+                  width: double.infinity,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        CustomFilterChip(text: 'Movies'),
+                        CustomFilterChip(text: 'TV shows'),
+                        
+                      ],
+                    ),
+                  ),
+                ),
+            BaseUi(
+              isPrime: false,
+              isSubNeeded: false,
+              allContent:allContent,pageViewList: trendingAll,)
           ],
         ),
       ),

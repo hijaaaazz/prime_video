@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:netflix/screens/widgets/appbar.dart';
@@ -51,7 +50,7 @@ class _ScreenDownloadState extends State<ScreenDownload> {
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
-                        ),
+                        )
                       ),
                     ),
                   ),

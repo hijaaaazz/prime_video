@@ -12,6 +12,7 @@ class CustomAppBar extends StatelessWidget {
 
     return AppBar(
       automaticallyImplyLeading: false,
+      
       backgroundColor: AppStyle.black,
       title: Text(
                 title,

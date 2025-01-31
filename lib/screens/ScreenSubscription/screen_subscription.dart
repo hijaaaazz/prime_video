@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:netflix/screens/ScreenHome/widgets/carousel_slider.dart';
-import 'package:netflix/screens/ScreenHome/widgets/shows_categories.dart';
+import 'package:netflix/functions/api_functions.dart';
+import 'package:netflix/models/categories.dart';
 import 'package:netflix/screens/widgets/appbar.dart';
 import 'package:netflix/screens/widgets/base_ui.dart';
 
@@ -12,19 +12,39 @@ class ScreenSubscription extends StatefulWidget {
 }
 
 class _ScreenSubscriptionState extends State<ScreenSubscription> {
+  late Future<List<ContentCategories>> subscriptionCategories;
+  late Future<ContentCategories> trendingSubContents;
+
+  @override
+  void initState() {
+    super.initState();
+    subscriptionCategories = _fetchSubscriptionCategories();
+    trendingSubContents = Api().getTrendingAll();
+  }
+
+  Future<List<ContentCategories>> _fetchSubscriptionCategories() async {
+    return Future.wait([
+      Api().getTopRatedMovies(), 
+      Api().getPopularMovies(), 
+      Api().getNowPlayingMovies(),
+     
+    ]);
+  }
+  
+
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
             CustomAppBar(title: 'Subscription'),
-            SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.29,
-                  width: double.infinity,
-                  child: CustomPageView(),
-                ),
-                MovieCategories(),
+            BaseUi(
+              isPrime: false,
+              isSubNeeded: true,
+              allContent: subscriptionCategories,
+              pageViewList: trendingSubContents, 
+            ),
           ],
         ),
       ),

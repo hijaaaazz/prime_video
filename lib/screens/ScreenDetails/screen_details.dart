@@ -1,22 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:netflix/models/genre_class.dart';
+import 'package:netflix/models/movie_class.dart';
 import 'package:netflix/screens/ScreenDetails/widgets/activities.dart';
 import 'package:netflix/screens/widgets/appbar.dart';
 import 'package:netflix/utils/colors.dart';
 
+// ignore: must_be_immutable
 class ScreenDetails extends StatefulWidget {
-  const ScreenDetails({super.key});
+
+  Movie movie;
+   ScreenDetails({super.key, required this.movie});
 
   @override
   State<ScreenDetails> createState() => _ScreenDetailsState();
 }
 
 class _ScreenDetailsState extends State<ScreenDetails> {
-  // Boolean variable to toggle visibility of more details
-  bool _isDetailsExpanded = false;
+  
 
   @override
   Widget build(BuildContext context) {
+   
+  final Map<String, String> languageMap = {
+  'en': 'English',
+  'ml': 'Malayalam',
+  'ta': 'Tamil',
+  'te': 'Telugu',
+  'hi': 'Hindi',
+};
+
+
     return Scaffold(
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
@@ -26,7 +40,7 @@ class _ScreenDetailsState extends State<ScreenDetails> {
             CustomAppBar(title: ''),
             Stack(
               children: [
-                Image.asset('assets/images/barroz.jpg', fit: BoxFit.cover),
+                Image.network(widget.movie.posterPath, fit: BoxFit.cover),
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
@@ -48,11 +62,12 @@ class _ScreenDetailsState extends State<ScreenDetails> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Barroz',
+                  Text(widget.movie.originalTitle,
                       style: GoogleFonts.outfit(
                           fontSize: 30, fontWeight: FontWeight.bold)),
+                      
                   Container(
-                    margin: EdgeInsets.only(right: 30),
+                    margin: EdgeInsets.only(right: 35),
                     width: double.infinity,
                     height: 55,
                     decoration: BoxDecoration(
@@ -73,14 +88,13 @@ class _ScreenDetailsState extends State<ScreenDetails> {
                     width: double.infinity,
                     height: 100,
                     child: ListView(
-                      scrollDirection: Axis.horizontal, // Horizontal scroll
+                      scrollDirection: Axis.horizontal, 
                       children: [
                         ActivityIcons(icon: Icons.movie, label: "Trailer"),
                         ActivityIcons(icon: Icons.watch_later, label: "Watchlist"),
-                        ActivityIcons(icon: Icons.favorite, label: "Like"),
-                        ActivityIcons(icon: Icons.movie, label: "Trailer"),
-                        ActivityIcons(icon: Icons.watch_later, label: "Watchlist"),
-                        ActivityIcons(icon: Icons.favorite, label: "Like"),
+                        ActivityIcons(icon: Icons.thumb_up, label: "Like"),
+                        ActivityIcons(icon: Icons.thumb_down, label: "Not for me"),
+                        ActivityIcons(icon: Icons.share, label: "Share"),
                       ],
                     ),
                   ),
@@ -93,17 +107,22 @@ class _ScreenDetailsState extends State<ScreenDetails> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Digaama Thamburaante Vishwasthannaya nidhi sookshippukaaran, Nidhi kkodukkan bhoomiyileekk thirichu varunna barross and after effects",
-                    style: GoogleFonts.outfit(fontSize: 17),
+                    widget.movie.overview,
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
+                    style: GoogleFonts.outfit(fontSize: 15),
                   ),
                   SizedBox(height: 6),
                   Text(
-                    "Fantasy, Action",
+                    widget.movie.genreIds
+                        .map((id) => GenreConverter.getGenreName(id)) // Convert IDs to genre names
+                        .join(", "), // Join the names into a single string with commas
                     style: GoogleFonts.outfit(
                         fontSize: 20, fontWeight: FontWeight.bold),
                   ),
+
                   SizedBox(height: 10),
-                  Text("IMDb 10"),
+                  Text(widget.movie.voteAverage.toString()),
                   Text('2024 175 min'),
                   SizedBox(height: 15),
                   Container(
@@ -114,7 +133,7 @@ class _ScreenDetailsState extends State<ScreenDetails> {
                       borderRadius: BorderRadius.circular(5), // Rounded corners
                     ),
                     child: Text(
-                      'U/A 13+',
+                      widget.movie.adult? 'A 18+' :'U/A',
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -122,79 +141,46 @@ class _ScreenDetailsState extends State<ScreenDetails> {
                     ),
                   ),
                   SizedBox(height: 10),
-                  Text(
-                    "Language",
-                    style: GoogleFonts.lato(
-                      color: Colors.blue,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text("Malayalam", style: TextStyle(color: Colors.white)),
-                  SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "More Details",
-                        style: GoogleFonts.lato(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold),
+
+                    Text(
+                      "Language",
+                      style: GoogleFonts.lato(
+                        color: Colors.blue,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _isDetailsExpanded = !_isDetailsExpanded; // Toggle the value
-                          });
-                        },
-                        icon: _isDetailsExpanded?  Icon(Icons.arrow_drop_up): Icon(Icons.arrow_drop_down),
-                      )
-                    ],
-                  ),
-                  
-                 Visibility(
-                  visible: _isDetailsExpanded, 
-                  child: ListView.builder(
-                    shrinkWrap: true, // Allows the ListView to take up as much space as it needs
-                    physics: NeverScrollableScrollPhysics(), // Prevent scrolling within the ListView
-                    itemCount: 5, // The number of items in the details list
-                    itemBuilder: (context, index) {
-                      
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Divider(
-                              height: 20,
-                            ),
-                            Text(
-                              "Director", // Use the header
-                              style: GoogleFonts.outfit(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            Text(
-                              "Lalettan", // Use the value
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.outfit(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey,
-                                
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
+                    ),
+                    Text(
+                      languageMap[widget.movie.originalLanguage] ?? widget.movie.originalLanguage, 
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    SizedBox(height: 20),
+                    Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Divider(height: 20),
+                Text(
+                  "Release Date",  // Use the key as the header (e.g., "Director")
+                  style: GoogleFonts.outfit(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
+                SizedBox(height: 10),
+                Text(
+                  widget.movie.releaseDate,  // Use the value (e.g., "Lalettan")
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.outfit(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
 
+                
                   SizedBox(height: 50,)
                 ],
               ),

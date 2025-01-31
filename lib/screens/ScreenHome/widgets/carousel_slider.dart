@@ -1,85 +1,178 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:netflix/models/categories.dart';
+import 'package:netflix/screens/ScreenDetails/screen_details.dart';
+import 'package:netflix/screens/widgets/loading_indicator.dart';
+import 'package:netflix/utils/colors.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:netflix/models/movie_class.dart';
 
+// ignore: must_be_immutable
 class CustomPageView extends StatefulWidget {
+  final Future<ContentCategories> categories;
+  
+  bool prime;
+  
+  bool isSubNeeded; // Single Future for a category
+
+   CustomPageView({required this.prime, required this.isSubNeeded, super.key, required this.categories});
+
   @override
+  // ignore: library_private_types_in_public_api
   _CustomPageViewState createState() => _CustomPageViewState();
 }
 
 class _CustomPageViewState extends State<CustomPageView> {
   final PageController _pageController = PageController();
-  
-  final List<String> imageUrls = [
-    'https://via.placeholder.com/400x200/FF0000/FFFFFF?text=Image1',
-    'https://via.placeholder.com/400x200/00FF00/FFFFFF?text=Image2',
-    'https://via.placeholder.com/400x200/0000FF/FFFFFF?text=Image3',
-    'https://via.placeholder.com/400x200/FF0000/FFFFFF?text=Image1',
-    'https://via.placeholder.com/400x200/00FF00/FFFFFF?text=Image2',
-    'https://via.placeholder.com/400x200/0000FF/FFFFFF?text=Image3',
-  ];
 
   int currentPage = 0;
 
   @override
   void initState() {
     super.initState();
-    
-    // Initial page setup to simulate infinite scrolling
+
     Future.delayed(Duration.zero, () {
-      _pageController.jumpToPage(1000); 
+      _pageController.jumpToPage(1000); // Infinite scroll start position
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          height: MediaQuery.of(context).size.height*0.25,
-          child: PageView.builder(
-            
-            controller: _pageController,
-            itemCount: null, // No limit for infinite scrolling
-            onPageChanged: (index) {
-              setState(() {
-                currentPage = index % imageUrls.length; // Wrap around using modulo
-              });
-            },
-            itemBuilder: (context, index) {
-              // Wrap around index to simulate infinite scrolling
-              int currentIndex = index % imageUrls.length; 
-              return Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                ),
-                // child: ClipRRect(
-                //   borderRadius: BorderRadius.circular(10),
-                //   child: Image.network(imageUrls[currentIndex], fit: BoxFit.cover, width: double.infinity),
-                // ),
-              );
-            },
-            pageSnapping: true,
-          ),
-        ),
-        SizedBox(height: 10,),
-        
-        Container(
-          height: MediaQuery.of(context).size.height*0.02,
-          child: SmoothPageIndicator(
-            controller: _pageController,
-            count: imageUrls.length,
-            effect: ExpandingDotsEffect(
-              radius: 6, 
-              dotWidth: 8, // Shrinks the side dots
-              dotHeight: 8, // Shrinks the side dots
-              spacing: 6, // Adjust space between dots
-              dotColor: Colors.grey, // Color of the side dots
-              activeDotColor: Colors.white, // Color of the active dot
-            ),
-          ),
-        )
+    String infoText = "";
+    if(widget.isSubNeeded){
+      infoText = "Subscribe to watch";
+    }else if(widget.prime){
+      infoText = "Watch with Prime";
+    }
+    return FutureBuilder<ContentCategories>(
+      future: widget.categories,  // The Future passed into the widget
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          
+          return Center(child: LoadingCircle());
+        } else if (snapshot.hasError) {
+         
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData) {
+          
+          return Center(child: Text('No Data Available'));
+        } else {
+          
+          final category = snapshot.data!;  
+          return Column(
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.25,
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: null, 
+                  onPageChanged: (index) {
+                    setState(() {
+                      currentPage = index % category.movieList.length; 
+                    });
+                  },
+                  itemBuilder: (context, index) {
+                    if (category.movieList.isEmpty) {
+                      return Center(child: Text('No movies available'));
+                    }
+                    int currentIndex = index % category.movieList.length;
+                    Movie movie = category.movieList[currentIndex];
 
-      ],
+                    // ignore: deprecated_member_use
+                    var withOpacity = Colors.white.withOpacity(0.8);
+                    
+                    return GestureDetector(
+                      onTap: (){
+                        Navigator.of(context).push(MaterialPageRoute(builder:(context) => ScreenDetails(movie: movie)));
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(color: Colors.white),
+                        child: Stack(
+                          children: [
+                            ClipRRect(
+                              child: Image.network(
+                                movie.backdropPath,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                              ),
+                            ),
+                            
+                            Positioned(child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  end: Alignment.topCenter,
+                                  begin: Alignment.bottomCenter,
+                                  colors: [
+                                  const Color.fromARGB(202, 0, 0, 0),
+                                  const Color.fromARGB(0, 0, 0, 0),
+                                ])
+                              ),
+                            )),
+                            Positioned(
+                              bottom: 10,
+                              left: 10,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    movie.title,
+                                    style: GoogleFonts.emilysCandy(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      // ignore: deprecated_member_use
+                                      color: withOpacity,
+                                    ),
+                                  ),
+                                  Visibility(
+                                      visible: widget.prime || widget.isSubNeeded,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(top: 5),
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.shopping_bag,color: Colors.yellow,size: 13,),
+                                            SizedBox(width: 5,),
+                                            Text(infoText,
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              color: AppStyle.white
+                                            ),),
+                                          ],
+                                        ),
+                                      ))
+
+                                ],
+                              ),
+                            ),
+                            
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  pageSnapping: true,
+                ),
+              ),
+              SizedBox(height: 10),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.02,
+                child: SmoothPageIndicator(
+                  controller: _pageController,
+                  count: 5,
+                  effect: ExpandingDotsEffect(
+                    radius: 6,
+                    dotWidth: 8,
+                    dotHeight: 8,
+                    spacing: 6,
+                    dotColor: Colors.grey,
+                    activeDotColor: Colors.white,
+                  ),
+                ),
+              ),
+
+            ],
+          );
+        }
+      },
     );
   }
 }
