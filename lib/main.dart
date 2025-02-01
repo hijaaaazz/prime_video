@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:netflix/screens/ScreenSplash/screen_splash.dart';
+import 'package:netflix/screens/ScreenMain/screen_main.dart';
 import 'package:netflix/utils/colors.dart';
 
 void main() {
@@ -11,18 +11,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AppStyle appStyle = AppStyle(); // Using Singleton
+    AppStyle appStyle = AppStyle(); 
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: appStyle.primaryColor,
-        scaffoldBackgroundColor: AppStyle.black, // Using static property
+        scaffoldBackgroundColor: AppStyle.black, 
         iconButtonTheme: IconButtonThemeData(
           style: ButtonStyle(
-            iconColor: WidgetStateProperty.all<Color>(Colors.white), // Updated from MaterialStateProperty
-            iconSize: WidgetStateProperty.all<double>(20), // Updated from MaterialStateProperty
+            iconColor: WidgetStateProperty.all<Color>(Colors.white), 
+            iconSize: WidgetStateProperty.all<double>(20),
           ),
         ),
 
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
           bodySmall: TextStyle(color: AppStyle.white), 
         ),
       ),
-      home: const ScreenSplash(),
+      home: const ScreenMain(),
     );
   }
 }
