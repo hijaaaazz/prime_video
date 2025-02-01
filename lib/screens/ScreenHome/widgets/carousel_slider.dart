@@ -10,12 +10,15 @@ import 'package:netflix/models/movie_class.dart';
 // ignore: must_be_immutable
 class CustomPageView extends StatefulWidget {
   final Future<ContentCategories> categories;
-  
   bool prime;
-  
-  bool isSubNeeded; // Single Future for a category
+  bool isSubNeeded;
 
-   CustomPageView({required this.prime, required this.isSubNeeded, super.key, required this.categories});
+  CustomPageView({
+    required this.prime,
+    required this.isSubNeeded,
+    super.key,
+    required this.categories,
+  });
 
   @override
   // ignore: library_private_types_in_public_api
@@ -24,51 +27,38 @@ class CustomPageView extends StatefulWidget {
 
 class _CustomPageViewState extends State<CustomPageView> {
   final PageController _pageController = PageController();
-
   int currentPage = 0;
-
-  @override
-  void initState() {
-    super.initState();
-
-    Future.delayed(Duration.zero, () {
-      _pageController.jumpToPage(1000); // Infinite scroll start position
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     String infoText = "";
-    if(widget.isSubNeeded){
+    if (widget.isSubNeeded) {
       infoText = "Subscribe to watch";
-    }else if(widget.prime){
+    } else if (widget.prime) {
       infoText = "Watch with Prime";
     }
+
     return FutureBuilder<ContentCategories>(
-      future: widget.categories,  // The Future passed into the widget
+      future: widget.categories,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          
           return Center(child: LoadingCircle());
         } else if (snapshot.hasError) {
-         
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData) {
-          
           return Center(child: Text('No Data Available'));
         } else {
-          
-          final category = snapshot.data!;  
+          final category = snapshot.data!;
           return Column(
             children: [
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.25,
                 child: PageView.builder(
                   controller: _pageController,
-                  itemCount: null, 
+                  itemCount: category.movieList.length,
                   onPageChanged: (index) {
                     setState(() {
-                      currentPage = index % category.movieList.length; 
+                      currentPage = index % category.movieList.length;
                     });
                   },
                   itemBuilder: (context, index) {
@@ -78,12 +68,12 @@ class _CustomPageViewState extends State<CustomPageView> {
                     int currentIndex = index % category.movieList.length;
                     Movie movie = category.movieList[currentIndex];
 
-                    // ignore: deprecated_member_use
-                    var withOpacity = Colors.white.withOpacity(0.8);
-                    
+                    var withOpacity = const Color.fromARGB(174, 255, 255, 255);
+
                     return GestureDetector(
-                      onTap: (){
-                        Navigator.of(context).push(MaterialPageRoute(builder:(context) => ScreenDetails(movie: movie)));
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => ScreenDetails(movie: movie)));
                       },
                       child: Container(
                         decoration: BoxDecoration(color: Colors.white),
@@ -96,18 +86,20 @@ class _CustomPageViewState extends State<CustomPageView> {
                                 width: double.infinity,
                               ),
                             ),
-                            
-                            Positioned(child: Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  end: Alignment.topCenter,
-                                  begin: Alignment.bottomCenter,
-                                  colors: [
-                                  const Color.fromARGB(202, 0, 0, 0),
-                                  const Color.fromARGB(0, 0, 0, 0),
-                                ])
+                            Positioned(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    end: Alignment.topCenter,
+                                    begin: Alignment.bottomCenter,
+                                    colors: [
+                                      const Color.fromARGB(202, 0, 0, 0),
+                                      const Color.fromARGB(0, 0, 0, 0),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            )),
+                            ),
                             Positioned(
                               bottom: 10,
                               left: 10,
@@ -119,31 +111,34 @@ class _CustomPageViewState extends State<CustomPageView> {
                                     style: GoogleFonts.emilysCandy(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
-                                      // ignore: deprecated_member_use
                                       color: withOpacity,
                                     ),
                                   ),
                                   Visibility(
-                                      visible: widget.prime || widget.isSubNeeded,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(top: 5),
-                                        child: Row(
-                                          children: [
-                                            Icon(Icons.shopping_bag,color: Colors.yellow,size: 13,),
-                                            SizedBox(width: 5,),
-                                            Text(infoText,
+                                    visible: widget.prime || widget.isSubNeeded,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 5),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.shopping_bag,
+                                            color: Colors.yellow,
+                                            size: 13,
+                                          ),
+                                          SizedBox(width: 5),
+                                          Text(
+                                            infoText,
                                             style: TextStyle(
-                                              fontSize: 10,
-                                              color: AppStyle.white
-                                            ),),
-                                          ],
-                                        ),
-                                      ))
-
+                                                fontSize: 10,
+                                                color: AppStyle.white),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
                                 ],
                               ),
                             ),
-                            
                           ],
                         ),
                       ),
@@ -168,7 +163,6 @@ class _CustomPageViewState extends State<CustomPageView> {
                   ),
                 ),
               ),
-
             ],
           );
         }

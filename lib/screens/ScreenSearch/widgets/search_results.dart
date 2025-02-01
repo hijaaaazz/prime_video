@@ -16,36 +16,38 @@ class SearchResultsList extends StatelessWidget {
     required this.searchResults,
     required this.isLoading,
   });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Results for: $searchQuery",
-          style: GoogleFonts.outfit(
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
-          ),
+@override
+Widget build(BuildContext context) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        "Results for: $searchQuery",
+        style: GoogleFonts.outfit(
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
         ),
-        SizedBox(
-          width: double.infinity,
-          height: 500,
-          child: isLoading
-              ? Center(child: LoadingCircle())  
-              : (searchResults == null || searchResults!.movieList.isEmpty)
-                  ? Center(child: Text("No results found"))
-                  : ListView.builder(
-                      itemCount: searchResults!.movieList.length,
-                      itemBuilder: (context, index) {
-                        var movie = searchResults!.movieList[index];
-                        return MovieListTile(movie: movie);
-                      },
-                    ),
-        ),
-
-      ],
-    );
-  }
+      ),
+      SizedBox(
+        width: double.infinity,
+        height: 500,
+        child: isLoading
+            ? Center(child: LoadingCircle())  // Show a loading spinner
+            : (searchResults == null || searchResults!.movieList.isEmpty)
+                ? Center(child: Text("No results found"))
+                : ListView.builder(
+                    // Ensure we're safely accessing the list here
+                    itemCount: searchResults!.movieList.length, // Ensure the length is accurate
+                    itemBuilder: (context, index) {
+                      if (index >= searchResults!.movieList.length) {
+                        return Container(); 
+                      }
+                      var movie = searchResults!.movieList[index];
+                      return MovieListTile(movie: movie);
+                    },
+                  ),
+      ),
+    ],
+  );
+}
 }

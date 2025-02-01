@@ -5,6 +5,7 @@ import 'package:netflix/models/movie_class.dart';
 import 'package:netflix/screens/ScreenDetails/widgets/activities.dart';
 import 'package:netflix/screens/widgets/appbar.dart';
 import 'package:netflix/utils/colors.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // ignore: must_be_immutable
 class ScreenDetails extends StatefulWidget {
@@ -90,7 +91,19 @@ class _ScreenDetailsState extends State<ScreenDetails> {
                     child: ListView(
                       scrollDirection: Axis.horizontal, 
                       children: [
-                        ActivityIcons(icon: Icons.movie, label: "Trailer"),
+                      GestureDetector(
+                        onTap: () async {
+                          final movieTitle = widget.movie.title;
+                          final query = '$movieTitle trailer';
+                          final Uri url = Uri.parse('https://www.youtube.com/results?search_query=$query');
+
+                         
+                            await launchUrl(url);
+                         
+                        },
+                        child: ActivityIcons(icon: Icons.movie, label: "Trailer"),
+                      ),
+
                         ActivityIcons(icon: Icons.watch_later, label: "Watchlist"),
                         ActivityIcons(icon: Icons.thumb_up, label: "Like"),
                         ActivityIcons(icon: Icons.thumb_down, label: "Not for me"),
